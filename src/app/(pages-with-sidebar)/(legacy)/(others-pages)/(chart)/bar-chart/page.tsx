@@ -1,4 +1,4 @@
-import BarChartOne from "@/components/charts/Generic";
+// import BarChartOne from "@/components/charts/Generic";
 import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { Metadata } from "next";
@@ -15,7 +15,8 @@ export default function page() {
             <PageBreadcrumb pageTitle="Bar Chart" />
             <div className="space-y-6">
                 <ComponentCard title="Bar Chart 1">
-                    <BarChartOne />
+                    {/* <BarChartOne /> */}
+                    <p>a</p>
                 </ComponentCard>
             </div>
         </div>

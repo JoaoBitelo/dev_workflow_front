@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { ApexOptions } from "apexcharts";
+// import { ApexOptions } from "apexcharts";
 import dynamic from "next/dynamic";
 // Dynamically import the ReactApexChart component
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
@@ -140,7 +140,7 @@ const BubbleChart: React.FC<ChartProps> = ({ series, keepXaxis, keepYaxis }) => 
         },
         dataLabels: {
             enabled: true,
-            formatter: function (val, opts) {
+            formatter: function (_unused, opts) {
                 const data = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
                 return data.name; // show client name inside the bubble
             },
@@ -153,7 +153,7 @@ const BubbleChart: React.FC<ChartProps> = ({ series, keepXaxis, keepYaxis }) => 
         tooltip: {
             shared: false,
             intersect: true,
-            custom: ({ series, seriesIndex, dataPointIndex, w }) => {
+            custom: ({ seriesIndex, dataPointIndex, w }) => {
                 const client = w.config.series[seriesIndex].data[dataPointIndex];
                 return `<div style="padding:8px;">
                 <strong>${client.name}</strong><br/>
