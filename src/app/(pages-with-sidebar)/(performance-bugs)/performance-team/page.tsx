@@ -118,7 +118,7 @@ export default function Page() {
             </ComponentCard>
 
             {/* Estimated Technical Debt */}
-            <ComponentCard className="flex-1 space-y-1" title="Débito técnico detectado">
+            <ComponentCard className="flex-1 space-y-1" title="Débito técnico estimado">
                 <GenericChart
                     categories={categories}
                     series={seriesEstimated}

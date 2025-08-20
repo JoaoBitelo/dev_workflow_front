@@ -10,87 +10,135 @@ import Button from "@/components/ui/button/Button";
 import React, { useState, useEffect } from "react";
 import { useModal } from "@/hooks/useModal";
 
+type ClientRow = {
+    id: number;
+    name: string;
+    bill: number;
+    bill_calculated: number;
+    strategy: number;
+    strategy_calculated: number;
+    demand: number;
+    demand_calculated: number;
+};
+
+const getRandomInt = (min: any, max: any) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+function checkHasChanges(tableData: ClientRow[], originalData: ClientRow[]): boolean {
+    if (tableData.length !== originalData.length) return true;
+
+    return tableData
+        .slice() // avoid mutating original array
+        .sort((a, b) => a.id - b.id)
+        .some((item, i) => {
+            const originalItem = [...originalData].sort((a, b) => a.id - b.id)[i];
+            return (
+                item.id !== originalItem.id ||
+                item.name != originalItem.name ||
+                item.bill !== originalItem.bill ||
+                item.strategy !== originalItem.strategy ||
+                item.demand !== originalItem.demand
+            );
+        });
+}
+
+const recalcNormalizedData = (tableData: ClientRow[]) => {
+    const normalized = tableData.map((item) => ({ ...item }));
+    const maxValues: any = {};
+    ["bill", "strategy", "demand"].forEach((field) => {
+        maxValues[field] = Math.max(...normalized.map((item: any) => Number(item[field]) || 0));
+    });
+    normalized.forEach((item) => {
+        item.bill_calculated = maxValues["bill"] > 0 ? (Number(item.bill) / maxValues["bill"]) * 10 : 0;
+        item.strategy_calculated = maxValues["strategy"] > 0 ? (Number(item.strategy) / maxValues["strategy"]) * 10 : 0;
+        item.demand_calculated = maxValues["demand"] > 0 ? (Number(item.demand) / maxValues["demand"]) * 10 : 0;
+    });
+    return normalized;
+};
+
 export default function Page() {
     const [newClient, setNewClient] = useState({ name: "", bill: 0, strategy: 0 });
     const { isOpen, openModal, closeModal } = useModal();
     const [tableData, setTableData] = useState([
-        { id: 1, name: "Client A", bill: 1.87, strategy: 3.42, demand: 3.42 },
-        { id: 2, name: "Client B", bill: 4.23, strategy: 0.95, demand: 0.95 },
-        { id: 3, name: "Client C", bill: 3.57, strategy: 0.95, demand: 2.11 },
-        { id: 4, name: "Client D", bill: 0.67, strategy: 0.95, demand: 4.88 },
-        { id: 5, name: "Client E", bill: 2.99, strategy: 1.42, demand: 1.42 },
-        // { id: 6, name: "Client F", bill: 4.1, strategy: 1.42, demand: 0.33 },
+        {
+            id: 1,
+            name: "Client A",
+            bill: 1.87,
+            bill_calculated: 0,
+            strategy: 3.42,
+            strategy_calculated: 0,
+            demand: 3.42,
+            demand_calculated: 0,
+        },
+        {
+            id: 2,
+            name: "Client B",
+            bill: 4.23,
+            bill_calculated: 0,
+            strategy: 0.95,
+            strategy_calculated: 0,
+            demand: 0.95,
+            demand_calculated: 0,
+        },
+        {
+            id: 3,
+            name: "Client C",
+            bill: 3.57,
+            bill_calculated: 0,
+            strategy: 0.95,
+            strategy_calculated: 0,
+            demand: 2.11,
+            demand_calculated: 0,
+        },
+        {
+            id: 4,
+            name: "Client D",
+            bill: 0.67,
+            bill_calculated: 0,
+            strategy: 0.95,
+            strategy_calculated: 0,
+            demand: 4.88,
+            demand_calculated: 0,
+        },
+        {
+            id: 5,
+            name: "Client E",
+            bill: 2.99,
+            bill_calculated: 0,
+            strategy: 1.42,
+            strategy_calculated: 0,
+            demand: 1.42,
+            demand_calculated: 0,
+        },
     ]);
-    const [normalizedData, setNormalizedData] = useState<any[]>([]);
     const [originalData, setOriginalData] = useState<any[]>([]);
     const [hasChanges, setHasChanges] = useState(false);
 
     useEffect(() => {
-        recalcNormalizedData(tableData);
-        if (tableData.length !== originalData.length) {
-            setHasChanges(true);
-            return;
-        }
-
-        const hasChanges = tableData
-            .slice() // avoid mutating original array
-            .sort((a, b) => a.id - b.id)
-            .some((item, i, arr) => {
-                const originalItem = [...originalData].sort((a, b) => a.id - b.id)[i];
-                return (
-                    item.id !== originalItem.id ||
-                    item.name != originalItem.name ||
-                    item.bill !== originalItem.bill ||
-                    item.strategy !== originalItem.strategy ||
-                    item.demand !== originalItem.demand
-                );
-            });
-        console.log("hasChanges:", hasChanges);
-        setHasChanges(hasChanges);
+        setHasChanges(checkHasChanges(tableData, originalData));
     }, [tableData]);
-
-    const recalcNormalizedData = (
-        data: typeof tableData,
-        field?: string,
-        changedId?: number,
-        newName?: string | number
-    ) => {
-        const fields = ["bill", "strategy", "demand"] as const;
-        const normalized = data.map((item) => ({ ...item }));
-
-        fields.forEach((field) => {
-            const values = data.map((item) => Number(item[field]) || 0);
-            const maxValue = Math.max(...values);
-
-            normalized.forEach((item) => {
-                item[field] = maxValue > 0 ? (Number(item[field]) / maxValue) * 10 : 0;
-            });
-        });
-
-        // Propagate name only for the changed item
-        if (field === "name") {
-            const idx = normalized.findIndex((item) => item.id === changedId);
-            if (idx !== -1) {
-                normalized[idx].name = newName !== undefined ? String(newName) : "";
-            }
-        }
-
-        setNormalizedData(normalized);
-    };
 
     // Trigger calculation on page render
     useEffect(() => {
-        recalcNormalizedData(tableData);
+        // recalcNormalizedData(tableData);
         setOriginalData(tableData);
         setHasChanges(false);
     }, []);
 
     const handleInputChange = (id: number, field: string, value: number | string) => {
-        setTableData((prev) => {
-            const updated = prev.map((item) => (item.id === id ? { ...item, [field]: value } : item));
-            recalcNormalizedData(updated, field, id, value);
-            return updated;
+        const updated = tableData.map((item) => {
+            if (item.id === id) return { ...item, [field]: value };
+            // ensure all other clients have proper numeric fields
+            return {
+                ...item,
+                bill: Number(item.bill) || 0,
+                strategy: Number(item.strategy) || 0,
+                demand: Number(item.demand) || 0,
+            };
         });
+        const normalized = recalcNormalizedData(updated);
+        setTableData(normalized);
     };
 
     const handleModalInputChange = (field: string, value: string) => {
@@ -114,17 +162,18 @@ export default function Page() {
     };
 
     const handleModalSaveButton = () => {
-        newClient;
-        setTableData([
-            ...tableData,
-            {
-                id: -1,
-                name: newClient.name,
-                bill: newClient.bill,
-                strategy: newClient.bill,
-                demand: 0,
-            },
-        ]);
+        const clientToAdd: ClientRow = {
+            id: getRandomInt(100, 1000000),
+            name: newClient.name,
+            bill: Number(newClient.bill) || 0,
+            bill_calculated: 0,
+            strategy: Number(newClient.strategy) || 0,
+            strategy_calculated: 0,
+            demand: 0,
+            demand_calculated: 0,
+        };
+        const normalized = recalcNormalizedData([...tableData, clientToAdd]);
+        setTableData(normalized);
         closeModal();
     };
 
@@ -141,7 +190,7 @@ export default function Page() {
             <PageBreadcrumb pageTitle="Gestao de clientes" />
             <ComponentCard title="Percentual da capacidade de trabalho">
                 <div className="grid grid-cols-2 gap-4">
-                    {tableData.map((item, index) => (
+                    {tableData.map((item) => (
                         <ComponentCard
                             key={item.id}
                             title={item.name}
@@ -162,7 +211,7 @@ export default function Page() {
                                             <Label>Nome</Label>
                                             <Input
                                                 type="text"
-                                                defaultValue={item.name}
+                                                value={item.name}
                                                 onChange={(e) => handleInputChange(item.id, "name", e.target.value)}
                                             />
                                         </div>
@@ -170,7 +219,7 @@ export default function Page() {
                                             <Label>Faturamento</Label>
                                             <Input
                                                 type="text"
-                                                defaultValue={item.bill}
+                                                value={item.bill}
                                                 onChange={(e) =>
                                                     handleInputChange(item.id, "bill", Number(e.target.value))
                                                 }
@@ -180,7 +229,7 @@ export default function Page() {
                                             <Label>Valor estrategico</Label>
                                             <Input
                                                 type="text"
-                                                defaultValue={item.strategy}
+                                                value={item.strategy}
                                                 onChange={(e) =>
                                                     handleInputChange(item.id, "strategy", Number(e.target.value))
                                                 }
@@ -198,27 +247,15 @@ export default function Page() {
                                     >
                                         <div>
                                             <Label>Nome</Label>
-                                            <Input
-                                                type="text"
-                                                defaultValue={normalizedData[index]?.name || ""}
-                                                disabled
-                                            />
+                                            <Input type="text" value={item.name} disabled />
                                         </div>
                                         <div>
                                             <Label>Faturamento</Label>
-                                            <Input
-                                                type="text"
-                                                defaultValue={normalizedData[index]?.bill || 0}
-                                                disabled
-                                            />
+                                            <Input type="text" value={item.bill_calculated} disabled />
                                         </div>
                                         <div>
                                             <Label>Valor estrategico</Label>
-                                            <Input
-                                                type="text"
-                                                defaultValue={normalizedData[index]?.strategy || 0}
-                                                disabled
-                                            />
+                                            <Input type="text" value={item.strategy_calculated} disabled />
                                         </div>
                                     </ComponentCard>
                                 </div>

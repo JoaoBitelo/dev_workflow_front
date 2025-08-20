@@ -105,6 +105,21 @@ const GenericChart: React.FC<ChartProps> = ({
                 text: xAxisTittle,
             },
         },
+        annotations: {
+            xaxis: [
+                {
+                    x: categories[Math.floor(categories.length / 2)], // middle of 12 sprints
+                    strokeDashArray: 4,
+                    borderColor: "#888",
+                    label: {
+                        text: "Simulação",
+                        orientation: "",
+                        offsetY: 15,
+                        style: { color: "#fff", background: "transparent" },
+                    },
+                },
+            ],
+        },
         legend: {
             show: true,
             position: "top",

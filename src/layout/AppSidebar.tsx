@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import { ChevronDownIcon, GridIcon, HorizontaLDots } from "../icons";
 import SidebarWidget from "./SidebarWidget";
-import { TrendingUp, Payment, Badge, School } from "@mui/icons-material";
+import { TrendingUp, Payment, Badge, School, ScheduleSend } from "@mui/icons-material";
 import Image from "next/image";
 
 type NavItem = {
@@ -40,6 +40,12 @@ const navItems: NavItem[] = [
             { name: "Cadastro", path: "/client-demand-crud", pro: false },
             { name: "Demanda", path: "/client-demand", pro: false },
         ],
+    },
+    {
+        icon: <ScheduleSend />,
+        name: "Simulação",
+        path: "/simulation",
+        pro: false,
     },
     {
         icon: <Payment />,
